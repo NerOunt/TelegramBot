@@ -550,6 +550,11 @@ async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         pass
 
 def main():
+    # Получаем переменные из окружения
+    WEBHOOK_URL = os.environ.get("WEBHOOK_URL")  # например: https://my-bot.onrender.com
+    PORT = int(os.environ.get("PORT", "8443"))   # Render задаёт PORT автоматически
+    SECRET_PATH = os.environ.get("SECRET_PATH", TOKEN)  # путь для безопасности
+
     application = Application.builder().token(TOKEN).build()
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("help", help_command))
@@ -588,8 +593,18 @@ def main():
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text_message))
     application.add_error_handler(error_handler)
     
-    print("🤖 Бот запущен...")
-    application.run_polling(allowed_updates=Update.ALL_TYPES)
+    # ЗАПУСК ЧЕРЕЗ ВЕБХУК (не polling!)
+    print("🤖 Запуск бота через вебхук...")
+    print(f"   Webhook URL: {WEBHOOK_URL}/{SECRET_PATH}")
+    print(f"   Port: {PORT}")
+    
+    application.run_webhook(
+        listen="0.0.0.0",
+        port=PORT,
+        url_path=SECRET_PATH,
+        webhook_url=f"{WEBHOOK_URL}/{SECRET_PATH}"
+    )
 if __name__ == '__main__':
     main() 
+
     
