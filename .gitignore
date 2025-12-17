@@ -1,8 +1,8 @@
-# Секреты
+# TOKEN
 .env
 *.env
 
-# Python
+# LIBS
 __pycache__/
 *.pyc
 *.pyo
